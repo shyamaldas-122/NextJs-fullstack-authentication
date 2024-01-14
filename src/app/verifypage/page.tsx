@@ -4,7 +4,7 @@ import React from 'react'
 import { toast,Toaster} from "react-hot-toast";
 setTimeout(() => {
   toast.success('Account Successfully Created!');
-}, 2000);
+}, 1500);
 
 
 export default function Page() {
