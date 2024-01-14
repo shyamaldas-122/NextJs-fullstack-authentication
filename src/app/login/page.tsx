@@ -3,7 +3,7 @@ import Link from "next/link";
 import React, {useEffect} from "react";
 import {useRouter} from "next/navigation";
 import axios from "axios";
-import { toast } from "react-hot-toast";
+import { toast,Toaster} from "react-hot-toast";
 import { ArrowRight } from 'lucide-react'
 
 
@@ -26,7 +26,7 @@ export default function LoginPage() {
             setLoading(true);
             const response = await axios.post("/api/users/login", user);
             console.log("Login success", response.data);
-            toast.success("Login success");
+            toast.success("Login Successful!");
             router.push("/profile");
         } catch (error:any) {
             console.log("Login failed", error.message);
@@ -46,6 +46,13 @@ export default function LoginPage() {
 
     return (
         <section>
+          <div>
+          <Toaster
+          position="top-center"
+          reverseOrder={false}
+          />
+          </div>
+
       <div className="flex items-center justify-center px-4 py-10 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
         <div className="xl:mx-auto xl:w-full xl:max-w-sm 2xl:max-w-md">
           <div className="mb-2 flex justify-center">
@@ -100,10 +107,10 @@ export default function LoginPage() {
                     {' '}
                     Password{' '}
                   </label>
-                  <a href="#" title="" className="text-sm font-semibold text-black hover:underline">
+                  <Link href="/resetpassword" title="" className="text-sm font-semibold text-black hover:underline">
                     {' '}
                     Forgot password?{' '}
-                  </a>
+                  </Link>
                 </div>
                 <div className="mt-2">
                   <input
@@ -126,32 +133,32 @@ export default function LoginPage() {
                   loading?
                   (
                     <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="40"
-                        height="40"
-                        viewBox="0 0 50 50"
-                        style={{textAlign:"center", fontSize:"15px", width:"30px"}}
-                        >
-                        <circle
-                            cx="25"
-                            cy="25"
-                            r="20"
-                            fill="none"
-                            stroke-width="5"
-                            stroke="#ccc"
-                            stroke-dasharray="31.41592653589793 31.41592653589793"
-                        >
-                            <animateTransform
-                            attributeName="transform"
-                            attributeType="XML"
-                            type="rotate"
-                            from="0 25 25"
-                            to="360 25 25"
-                            dur="1s"
-                            repeatCount="indefinite"
-                            />
-                        </circle>
-                        </svg>
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="40"
+                    height="40"
+                    viewBox="0 0 50 50"
+                    style={{ textAlign: "center", fontSize: "15px", width: "30px" }}
+                  >
+                    <circle
+                      cx="25"
+                      cy="25"
+                      r="20"
+                      fill="none"
+                      strokeWidth="5"
+                      stroke="#ccc"
+                      strokeDasharray="31.41592653589793 31.41592653589793"
+                    >
+                      <animateTransform
+                        attributeName="transform"
+                        attributeType="XML"
+                        type="rotate"
+                        from="0 25 25"
+                        to="360 25 25"
+                        dur="1s"
+                        repeatCount="indefinite"
+                      />
+                    </circle>
+                  </svg>
                   )
                   :
                   (

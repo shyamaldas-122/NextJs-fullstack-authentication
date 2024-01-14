@@ -1,8 +1,21 @@
+"use client"
 import Link from "next/link";
 import React from 'react'
+import { toast,Toaster} from "react-hot-toast";
+setTimeout(() => {
+  toast.success('Account Successfully Created!');
+}, 2000);
 
-export default function page() {
+
+export default function Page() {
   return (
+      <>
+        <div>
+          <Toaster
+          position="top-center"
+          reverseOrder={false}
+          />
+        </div>
     <div className="min-h-screen flex items-center justify-center bg-gray-100 text-center">
       <div className="max-w-md w-full p-6 bg-white rounded-md shadow-md">
         <h2 className="text-3xl font-extrabold text-gray-800 mb-6">Account Verification</h2>
@@ -19,5 +32,6 @@ export default function page() {
         {/* Add additional elements, such as a countdown timer or a button to navigate elsewhere */}
       </div>
     </div>
+    </>
   )
 }
