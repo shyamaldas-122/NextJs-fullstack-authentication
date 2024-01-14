@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {useRouter} from "next/navigation";
 import axios from "axios";
 import { toast,Toaster} from "react-hot-toast";
@@ -18,14 +18,45 @@ export default function ResetPasswordPage() {
     })
     const [buttonDisabled, setButtonDisabled] = React.useState(false);
     const [loading, setLoading] = React.useState(false);
+    
+    const [errors, setErrors] = useState({
+      email: "",
+    });
 
+    const validateEmail = (email:any) => {
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    };
+
+    const validateForm = () => {
+      const newErrors = {
+        email: "",
+      };
+  
+      if (!user.email) {
+        newErrors.email = "Email is required";
+      } else if (!validateEmail(user.email)) {
+        newErrors.email = "Invalid email format";
+      }
+  
+      setErrors(newErrors);
+  
+      // Check if there are no errors
+      return Object.values(newErrors).every((error) => error === "");
+    };
+  
 
     const onEmailSend = async () => {
         try {
+          if (validateForm()) {
             setLoading(true);
             const response = await axios.post("/api/users/resetpassword", user);
             console.log("Reset success", response.data);
             toast.success("Password Reset Email Sent!");
+          }else{
+            toast.error(errors.email);
+          }
         } catch (error:any) {
             console.log("Mail Sent failed!", error);
             toast.error("User doesn't Exist!");
@@ -138,7 +169,7 @@ export default function ResetPasswordPage() {
                   )
                   :
                   (
-                  buttonDisabled?"Enter Your Email":"Send Email"
+                  "Send Email"
                   )
                   }
                   {buttonDisabled==false && loading==false && <ArrowRight className="ml-2" size={16}/>}

@@ -14,7 +14,7 @@ export default function ResetPage() {
     const [token, setToken] = useState("");
     const [error, setError] = useState(false);
 
-    const [btnmsg, Setbtnmsg]=useState("Reset Password")
+    // const [btnmsg, Setbtnmsg]=useState("Reset Password")
     const [buttonDisabled, setButtonDisabled] = React.useState(false);
     const [loading, setLoading] = React.useState(false);
 
@@ -25,9 +25,55 @@ export default function ResetPage() {
        
     })
 
+    const [errors, setErrors] = useState({
+      password: "",
+      confirmpassword:"",
+      match:""
+    });
+  
+    const validatePassword = (password:any) => {
+      // Password should be at least 6 characters
+      return password.length >= 6;
+    };
+
+    const validateForm = () => {
+      const newErrors = {
+        password: "",
+        confirmpassword:"",
+        match:""
+      };
+  
+      if (!user.password) {
+        newErrors.password = "Password is required";
+      } else if (!validatePassword(user.password)) {
+        newErrors.password = "Password should be at least 6 characters";
+      }
+
+      if (!user.confirmpassword) {
+        newErrors.confirmpassword = "Password is required";
+      } else if (!validatePassword(user.confirmpassword)) {
+        newErrors.confirmpassword = "Password should be at least 6 characters";
+      }
+
+      if (user.password!=user.confirmpassword) {
+        console.log("password not match");
+        
+        newErrors.match = "Password do not match";
+      }
+  
+      setErrors(newErrors);
+  
+      // Check if there are no errors
+      return Object.values(newErrors).every((error) => error === "");
+    };
+  
+
     const resetUserPassword = async () => {
       if(token.length > 0){
         try {
+          console.log(validateForm());
+          
+          if (validateForm()) {
             setLoading(true)
             console.log("In reset page",user)
             // console.log("only token",token)
@@ -36,6 +82,10 @@ export default function ResetPage() {
             // setResetsuccess(true);
             toast.success("Password Reset Successful!")
             router.push("/login")
+          }else{
+            const errmsg=errors.password || errors.confirmpassword || errors.match
+            toast.error(errmsg)
+          }
         } catch (error:any) {
             setError(true);
             console.log(error.message);
@@ -60,12 +110,7 @@ export default function ResetPage() {
         if(user.confirmpassword.length > 0 && user.password.length > 0) {
             if(user.password!=user.confirmpassword)
             {
-                Setbtnmsg("Passwords do not match")
                 setButtonDisabled(true);
-            }
-            else
-            {
-                Setbtnmsg("Reset Password")
             }
             setButtonDisabled(false);
         } else{
@@ -178,7 +223,7 @@ export default function ResetPage() {
                   )
                   :
                   (
-                  buttonDisabled?"Enter Password":`${btnmsg}`
+                  "Reset Password"
                   )
                   }
                   {buttonDisabled==false && loading==false && <ArrowRight className="ml-2" size={16}/>}

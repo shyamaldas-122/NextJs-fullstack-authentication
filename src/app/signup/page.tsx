@@ -1,7 +1,7 @@
 // making as client components
 "use client";
 import Link from "next/link";
-import React, { useEffect } from "react";
+import React, { useEffect,useState } from "react";
 import {useRouter} from "next/navigation";
 import axios from "axios";
 import { toast,Toaster} from "react-hot-toast";
@@ -20,19 +20,85 @@ export default function SignupPage() {
     const [buttonDisabled, setButtonDisabled] = React.useState(false);
     const [loading, setLoading] = React.useState(false);
 
+    const [errors, setErrors] = useState({
+      username : "",
+      email: "",
+      password: "",
+    });
+
+    const validateEmail = (email:any) => {
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    };
+  
+    const validatePassword = (password:any) => {
+      // Password should be at least 6 characters
+      return password.length >= 6;
+    };
+
+    const validateForm = () => {
+      const newErrors = {
+        username:"",
+        email: "",
+        password: "",
+      };
+  
+      // if (!user.email) {
+      //   newErrors.email = "Email is required";
+      // }
+  
+      // if (!user.password) {
+      //   newErrors.password = "Password is required";
+      // }
+      if (!user.username) {
+        newErrors.username = "Full name is required";
+      }
+
+      if (!user.email) {
+        newErrors.email = "Email is required";
+      } else if (!validateEmail(user.email)) {
+        newErrors.email = "Invalid email format";
+      }
+  
+      if (!user.password) {
+        newErrors.password = "Password is required";
+      } else if (!validatePassword(user.password)) {
+        newErrors.password = "Password should be at least 6 characters";
+      }
+  
+      setErrors(newErrors);
+  
+      // Check if there are no errors
+      return Object.values(newErrors).every((error) => error === "");
+    };
+
     const onSignup = async (e:any) => {
         try {
-            e.preventDefault();
+          e.preventDefault();
+          if (validateForm()) {
             setLoading(true);
             const response = await axios.post("/api/users/signup", user);
             console.log("Signup success", response.data);
             router.push("/verifypage");
             // toast.success('Account Successfully Created!')
+          }
+          else{
+            if(errors.username){
+              toast.error(errors.username);
+            }
+            else if(errors.email){
+              toast.error(errors.email);
+            }
+            else if(errors.password){
+              toast.error(errors.password);
+            }
+          }
             
         } catch (error:any) {
             console.log("Signup failed", error.message);
-            
-            toast.error(error.message);
+            const errorMessage = error.response.data.error || error.response.data.message;
+            toast.error(errorMessage);
         }finally {
             setLoading(false);
         }
@@ -175,7 +241,7 @@ export default function SignupPage() {
                   )
                   :
                   (
-                  buttonDisabled?"Enter All Details":"Create Account"
+                  "Create Account"
                   )
                   }
                   {buttonDisabled==false && loading==false && <ArrowRight className="ml-2" size={16}/>}

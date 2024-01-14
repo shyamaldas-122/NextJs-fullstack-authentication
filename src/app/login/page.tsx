@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import React, {useEffect} from "react";
+import React, {useEffect,useState} from "react";
 import {useRouter} from "next/navigation";
 import axios from "axios";
 import { toast,Toaster} from "react-hot-toast";
@@ -20,17 +20,77 @@ export default function LoginPage() {
     const [buttonDisabled, setButtonDisabled] = React.useState(false);
     const [loading, setLoading] = React.useState(false);
 
+    const [errors, setErrors] = useState({
+      email: "",
+      password: "",
+    });
+
+    const validateEmail = (email:any) => {
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    };
+  
+    const validatePassword = (password:any) => {
+      // Password should be at least 6 characters
+      return password.length >= 6;
+    };
+
+    const validateForm = () => {
+      const newErrors = {
+        email: "",
+        password: "",
+      };
+  
+      // if (!user.email) {
+      //   newErrors.email = "Email is required";
+      // }
+  
+      // if (!user.password) {
+      //   newErrors.password = "Password is required";
+      // }
+      if (!user.email) {
+        newErrors.email = "Email is required";
+      } else if (!validateEmail(user.email)) {
+        newErrors.email = "Invalid email format";
+      }
+  
+      if (!user.password) {
+        newErrors.password = "Password is required";
+      } else if (!validatePassword(user.password)) {
+        newErrors.password = "Password should be at least 6 characters";
+      }
+  
+      setErrors(newErrors);
+  
+      // Check if there are no errors
+      return Object.values(newErrors).every((error) => error === "");
+    };
+  
+
 
     const onLogin = async () => {
         try {
+          if (validateForm()) {
             setLoading(true);
             const response = await axios.post("/api/users/login", user);
             console.log("Login success", response.data);
             toast.success("Login Successful!");
             router.push("/profile");
+          }
+          else{
+            if(errors.email){
+              toast.error(errors.email);
+            }
+            else if(errors.password){
+              toast.error(errors.password);
+            }
+            
+          }
         } catch (error:any) {
             console.log("Login failed", error.message);
-            toast.error(error.message);
+            const errorMessage = error.response.data.error || error.response.data.message;
+            toast.error(errorMessage);
         } finally{
         setLoading(false);
         }
@@ -162,10 +222,10 @@ export default function LoginPage() {
                   )
                   :
                   (
-                  buttonDisabled?"Enter All Details":"Log in"
+                  "Log in"
                   )
                   }
-                  {buttonDisabled==false && loading==false && <ArrowRight className="ml-2" size={16}/>}
+                 {buttonDisabled==false && loading==false && <ArrowRight className="ml-2" size={16}/>}
                 </button>
               </div>
             </div>
