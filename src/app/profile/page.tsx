@@ -1,14 +1,16 @@
 "use client";
 import axios from "axios";
 import Link from "next/link";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {toast} from "react-hot-toast";
 import {useRouter} from "next/navigation";
 
 
 export default function ProfilePage() {
     const router = useRouter()
-    const [data, setData] = useState("nothing")
+    const [data, setData] = useState("Loading...")
+    const [email, setEmail] = useState("Loading...")
+    const [varify, setVarify] = useState(false)
     const logout = async () => {
         try {
             await axios.get('/api/users/logout')
@@ -20,31 +22,35 @@ export default function ProfilePage() {
         }
     }
 
-    const getUserDetails = async () => {
+    // const getUserDetails = async () => {
+    //     const res = await axios.get('/api/users/me')
+    //     console.log(res.data);
+    //     setData(res.data.data.username)
+    // }
+    useEffect(() => {
+        const fetchData = async () => {
         const res = await axios.get('/api/users/me')
         console.log(res.data);
-        setData(res.data.data._id)
-    }
+        setData(res.data.data.username)
+        setEmail(res.data.data.email)
+        setVarify(res.data.data.isVerified)
+        }
+        fetchData();
+    }, []);
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen py-2">
-            <h1>Profile</h1>
-            <hr />
-            <p>Profile page</p>
-            <h2 className="p-1 rounded bg-green-500">{data === 'nothing' ? "Nothing" : <Link href={`/profile/${data}`}>{data}
-            </Link>}</h2>
-        <hr />
-        <button
-        onClick={logout}
-        className="bg-blue-500 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >Logout</button>
-
-        <button
-        onClick={getUserDetails}
-        className="bg-green-800 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >GetUser Details</button>
-
-
+        <section className="bg-gray-100 flex flex-col items-center justify-center min-h-screen py-2 rounded-lg">
+            <div className="w-full lg:w-1/2 px-6 py-6 text-center">
+                <div className="bg-white rounded shadow-lg overflow-hidden p-8"> 
+                <div style={{width:"50%"}} className="m-auto pb-2">
+                <img className="rounded-full" src="https://lh3.googleusercontent.com/proxy/WysB1VUo63PNH2eWcVN6J929RehISqj8_gYbmSC5oiZj7cSFAeFrPeUZViN3O5LUOSJUqNZvi1SBwlJzFDUeIpLYc7itSbB8VvqaIE6KV3363rMNOEzboLqVCr26LzjakeHLGIyzDQ"/>
+                </div>
+                {varify && <h2 className="bg-green-500 hover:bg-green-600 text-white no-underline font-semibold inline-block uppercase text-sm py-2 px-6 rounded-full mb-2">Verified User</h2>}
+                <div className="font-bold text-xl mb-2">{data}</div>
+                <p className="text-grey-darker text-base mb-4">{email}</p>
+                <button className="inline-flex items-center justify-center px-4 py-2 text-base font-medium leading-6 text-white whitespace-no-wrap bg-red-600 border border-red-700 rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" onClick={logout}>Logout</button>
+                </div>
             </div>
+        </section>
     )
 }
